@@ -90,6 +90,24 @@ from .strategy_engine import (
     STRATEGY_DETAILS,
 )
 
+# Investment Strategies
+from .investment_strategies import (
+    StrategyName,
+    StrategyConfig,
+    PerformanceMetrics,
+    InvestmentStrategy,
+    DynamicRiskAllocation,
+    RegimeSwitching,
+    ProbabilityWeightedHedge,
+    MomentumRiskOverlay,
+    create_strategy,
+    compare_strategies,
+    calculate_metrics,
+    calculate_drawdown_series,
+    get_strategy_weights_history,
+    get_current_recommendation,
+)
+
 
 __all__ = [
     # Version
@@ -160,4 +178,19 @@ __all__ = [
     "DEFAULT_ALLOCATIONS",
     "RISK_STRATEGY_MAP",
     "STRATEGY_DETAILS",
+    # Investment Strategies
+    "StrategyName",
+    "StrategyConfig",
+    "PerformanceMetrics",
+    "InvestmentStrategy",
+    "DynamicRiskAllocation",
+    "RegimeSwitching",
+    "ProbabilityWeightedHedge",
+    "MomentumRiskOverlay",
+    "create_strategy",
+    "compare_strategies",
+    "calculate_metrics",
+    "calculate_drawdown_series",
+    "get_strategy_weights_history",
+    "get_current_recommendation",
 ]

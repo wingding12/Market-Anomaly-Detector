@@ -24,7 +24,9 @@ Traditional risk metrics like VaR and standard deviation assume normal distribut
 
 **Strategy Recommendations**: Translates probability scores into actionable portfolio positioning—from maintaining full exposure during benign conditions to implementing defensive hedges when risk is critical.
 
-**Historical Backtesting**: Examine how the model would have performed during specific market events. Compare predicted probabilities against actual market outcomes to build confidence in the signals.
+**Investment Strategy Backtesting**: Four distinct systematic strategies with full performance analytics. Compare approaches like dynamic risk scaling, regime switching, and probability-weighted hedging against traditional buy-and-hold.
+
+**Historical Event Analysis**: Examine how the model would have performed during specific market events. Compare predicted probabilities against actual market outcomes to build confidence in the signals.
 
 ---
 
@@ -87,19 +89,117 @@ These thresholds aren't arbitrary—they're calibrated against historical drawdo
 
 ---
 
+## Investment Strategies
+
+The system implements four systematic approaches to translate crash probabilities into portfolio positions. Each strategy addresses a different investment philosophy and risk profile.
+
+### Strategy 1: Dynamic Risk Allocation
+
+The most intuitive approach—scale equity exposure inversely to crash probability.
+
+```
+equity_weight = max_weight - (crash_probability × (max_weight - min_weight))
+```
+
+At 0% probability, you're at maximum equity (90%). At 100% probability, you're at minimum (10%). The key insight: don't wait for crash confirmation. Reduce exposure proportionally as warning signs accumulate.
+
+**Characteristics:**
+
+- Smooth, continuous adjustments
+- No sharp portfolio transitions
+- Higher turnover but smaller individual trades
+- Best for: Investors who prefer gradual risk management
+
+### Strategy 2: Regime Switching
+
+Binary approach with predefined allocations for each risk regime:
+
+| Regime      | Probability | Equity | Bonds | Cash |
+| ----------- | ----------- | ------ | ----- | ---- |
+| Risk-On     | 0-25%       | 80%    | 15%   | 5%   |
+| Cautious    | 25-50%      | 50%    | 35%   | 15%  |
+| Defensive   | 50-75%      | 25%    | 45%   | 30%  |
+| Max Defense | 75-100%     | 10%    | 40%   | 50%  |
+
+**Characteristics:**
+
+- Clear, rule-based transitions
+- Lower turnover (trades only on regime changes)
+- Potentially more tax-efficient
+- Best for: Investors who want simple, transparent rules
+
+### Strategy 3: Probability-Weighted Hedging
+
+Maintains base equity exposure while layering proportional hedges. The philosophy: stay invested for upside capture, but size tail protection based on risk levels.
+
+```
+hedge_allocation = crash_probability × max_hedge_weight
+```
+
+Hedge instruments could include:
+
+- Put options or put spreads on equity indices
+- VIX call options
+- Inverse ETFs for tactical exposure
+- Gold as a flight-to-quality asset
+
+**Characteristics:**
+
+- Preserves upside participation
+- Explicit cost (hedge premium decay)
+- Better during prolonged elevated-risk periods
+- Best for: Investors who can't afford to miss rallies but need crash protection
+
+### Strategy 4: Momentum + Risk Overlay
+
+Combines trend-following with crash probability as an override signal.
+
+Logic:
+
+1. Calculate momentum: is price above 20-week moving average?
+2. If momentum negative → exit regardless of crash probability
+3. If momentum positive AND risk low → full exposure
+4. If momentum positive BUT risk high → reduced exposure
+
+**Characteristics:**
+
+- Avoids fighting sustained downtrends
+- Benefits from momentum's historical edge
+- Can miss sharp reversal rallies
+- Best for: Trend-followers who want additional crash protection
+
+### Performance Metrics
+
+Each strategy is evaluated using:
+
+| Metric            | Description                                                   |
+| ----------------- | ------------------------------------------------------------- |
+| **Sharpe Ratio**  | Risk-adjusted return (excess return ÷ volatility)             |
+| **Sortino Ratio** | Downside-adjusted return (penalizes only negative volatility) |
+| **Max Drawdown**  | Worst peak-to-trough decline                                  |
+| **Calmar Ratio**  | Return ÷ max drawdown—measures recovery efficiency            |
+| **Win Rate**      | Percentage of positive periods                                |
+| **Profit Factor** | Gross gains ÷ gross losses                                    |
+
+The Strategy page lets you backtest all four approaches against a 60/40 benchmark with customizable parameters.
+
+---
+
 ## Application Structure
 
 ```
-├── app.py                      # Main dashboard
+├── app.py                        # Main dashboard
 ├── pages/
-│   ├── 1_📊_Analysis.py        # Deep-dive analytics
-│   └── 2_📜_Historical.py      # Event studies
+│   ├── 1_📊_Analysis.py          # Deep-dive analytics
+│   ├── 2_📜_Historical.py        # Event studies
+│   └── 3_💰_Strategies.py        # Investment strategy backtester
 └── src/
-    ├── data_loader.py          # Data ingestion pipeline
-    ├── feature_engineering.py  # Transformations
-    ├── predictor.py            # Model inference
-    ├── explainer.py            # SHAP attribution
-    └── strategy_engine.py      # Portfolio recommendations
+    ├── data_loader.py            # Data ingestion pipeline
+    ├── feature_engineering.py    # Transformations
+    ├── predictor.py              # Model inference
+    ├── explainer.py              # SHAP attribution
+    ├── strategy_engine.py        # Portfolio recommendations
+    └── investment_strategies.py  # Systematic trading strategies
 ```
 
 ### Dashboard (Main Page)
@@ -131,6 +231,17 @@ Event-specific analysis covering:
 - COVID-19 crash (2020)
 
 Compare model predictions against actual outcomes to understand signal lead times and accuracy.
+
+### Strategies Page
+
+Full investment strategy backtesting:
+
+- **Current Recommendation**: Real-time positioning advice based on latest probability and your risk tolerance
+- **Strategy Comparison**: Side-by-side performance of all four strategies against 60/40 benchmark
+- **Cumulative Returns**: Visualize growth trajectories and identify when strategies outperformed
+- **Drawdown Analysis**: Compare worst-case scenarios across approaches
+- **Dynamic Allocation Chart**: See how weights change over time for each strategy
+- **Risk-Return Scatter**: Visual comparison of return vs volatility trade-offs
 
 ---
 
@@ -214,6 +325,24 @@ Expect the model to spend roughly 10-15% of time in "high" or "critical" states 
 
 **Watch for regime changes.** The model was trained on historical data. Novel market structures (cryptocurrency integration, central bank balance sheet expansion) may create patterns outside the training distribution.
 
+### Interpreting Strategy Backtests
+
+When evaluating strategy performance:
+
+- **Sharpe Ratio > 0.5** is generally considered acceptable; above 1.0 is strong
+- **Max Drawdown** matters more for capital preservation mandates—compare against your loss tolerance
+- **Win Rate** alone is misleading; a 40% win rate with 2:1 profit factor is excellent
+- **Calmar Ratio** shows how efficiently you recover from losses—higher is better
+
+Remember that backtests are optimistic. Real-world implementation faces:
+
+- Execution slippage during volatile periods
+- Bid-ask spreads that increase during stress
+- Funding costs for leveraged positions
+- Tax implications of frequent rebalancing
+
+The strategies page uses weekly rebalancing and 10bps transaction costs as defaults. Adjust these parameters to match your actual trading environment.
+
 ---
 
 ## Data Sources
@@ -258,9 +387,10 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 Pull requests welcome. Areas that would benefit from contribution:
 
-- Additional data source integrations
-- Alternative model architectures (LSTM, transformer)
-- Enhanced backtesting framework
-- Real-time alerting system
+- Additional data source integrations (Bloomberg API, Refinitiv, Alpha Vantage)
+- Alternative model architectures (LSTM, transformer, ensemble methods)
+- Options-based hedging calculators with Greeks
+- Real-time alerting system (email/Slack notifications)
+- Transaction cost modeling improvements
 
 Open an issue first to discuss significant changes.
