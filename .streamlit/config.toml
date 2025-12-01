@@ -1,0 +1,23 @@
+[theme]
+# Custom theme for Market Anomaly Detector
+primaryColor = "#FF4B4B"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
+font = "sans serif"
+
+[server]
+# Server configuration
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+# Browser settings
+gatherUsageStats = false
+
+[runner]
+# Runner configuration
+magicEnabled = true
+fastReruns = true
+

@@ -1,0 +1,3 @@
+# Data directory for user-uploaded CSVs and cached market data
+# This folder is excluded from git tracking (except .gitkeep)
+
