@@ -26,6 +26,7 @@ Market-Anomaly-Detector/
 ├── app.py                    # Main Streamlit entry point
 ├── requirements.txt          # Python dependencies
 ├── xgb_weights.pkl          # Pre-trained XGBoost model
+├── FinancialMarketData.csv  # Historical market data (1999-2021)
 ├── README.md                 # This file
 │
 ├── .streamlit/
@@ -33,6 +34,7 @@ Market-Anomaly-Detector/
 │
 ├── src/                     # Core source modules
 │   ├── __init__.py
+│   ├── feature_schema.py    # Feature definitions & validation
 │   ├── data_loader.py       # Data fetching & CSV handling
 │   ├── feature_engineering.py # Feature extraction pipeline
 │   ├── model_utils.py       # Model loading utilities
@@ -123,13 +125,13 @@ This system uses an **XGBoost classifier** trained on historical market data to 
 
 ### Project Phases
 
-- [x] **Phase 1**: Foundation & Data Layer
+- [x] **Phase 1**: Foundation & Data Layer ✅
 
   - [x] Step 1.1: Project structure setup
-  - [ ] Step 1.2: Inspect model input requirements
-  - [ ] Step 1.3: Data fetching module
-  - [ ] Step 1.4: Feature engineering pipeline
-  - [ ] Step 1.5: Integration testing
+  - [x] Step 1.2: Inspect model input requirements
+  - [x] Step 1.3: Data fetching module
+  - [x] Step 1.4: Feature engineering pipeline
+  - [x] Step 1.5: Integration testing
 
 - [ ] **Phase 2**: Model Integration
 - [ ] **Phase 3**: Strategy Engine
@@ -144,18 +146,26 @@ This system uses an **XGBoost classifier** trained on historical market data to 
 
 The application supports multiple data sources:
 
-- **Yahoo Finance API**: Real-time and historical market data
-- **CSV Upload**: Custom datasets with OHLCV format
+- **Included Dataset**: `FinancialMarketData.csv` with 1,149 weekly observations (1999-2021)
+- **CSV Upload**: Custom datasets matching the required feature schema
 - **Pre-loaded Samples**: Demo data for testing
 
-### Expected CSV Format
+### Data Format
 
-```csv
-Date,Open,High,Low,Close,Volume
-2024-01-01,100.00,102.50,99.50,101.25,1000000
-2024-01-02,101.25,103.00,100.00,102.75,1200000
-...
-```
+The model expects **62 features** covering global financial markets:
+
+| Category                 | Features | Examples                                            |
+| ------------------------ | -------- | --------------------------------------------------- |
+| Commodities & Currencies | 8        | Gold (XAU), Dollar Index (DXY), JPY, GBP, WTI Crude |
+| Volatility               | 4        | VIX Index + 3 lag periods                           |
+| US Rates                 | 5        | 30Y, 10Y, 2Y Treasury, 3M T-Bill, 1M LIBOR          |
+| European Rates           | 4        | German Bunds, EONIA                                 |
+| Global Bonds             | 9        | Italian, Japanese, UK government bonds              |
+| Bond Indices             | 9        | Bloomberg Aggregate, MBS, Corporate, High Yield     |
+| Equity Indices           | 13       | MSCI USA, Europe, Japan, EM, World + 3 lags         |
+| Futures                  | 10       | S&P 500, Nasdaq, Euro Stoxx, Gold, Brent            |
+
+See `src/feature_schema.py` for the complete feature specification.
 
 ---
 
@@ -165,9 +175,29 @@ Date,Open,High,Low,Close,Volume
 
 The included `xgb_weights.pkl` is a pre-trained XGBoost binary classifier that predicts market crash conditions.
 
-- **Algorithm**: XGBoost (Gradient Boosting)
-- **Output**: Binary classification (Crash / No Crash)
-- **Explainability**: SHAP-compatible
+| Property      | Value                         |
+| ------------- | ----------------------------- |
+| Algorithm     | XGBoost (Gradient Boosting)   |
+| Type          | Binary Classification         |
+| Output        | Crash / No Crash              |
+| Features      | 62 (56 base + 6 lag features) |
+| Estimators    | 200 trees                     |
+| Max Depth     | 5                             |
+| Learning Rate | 0.05                          |
+| Objective     | binary:logistic               |
+
+### Top Predictive Features
+
+| Feature         | Importance | Description               |
+| --------------- | ---------- | ------------------------- |
+| VIX Index_lag_3 | 35.4%      | VIX momentum (3-week lag) |
+| EONIA Index     | 8.8%       | Euro overnight rate       |
+| GTDEM2Y Govt    | 8.6%       | German 2-year yield       |
+| ES1 Index       | 8.2%       | S&P 500 futures           |
+| MXJP Index      | 7.2%       | MSCI Japan                |
+| NQ1 Index       | 6.4%       | Nasdaq futures            |
+
+The model heavily relies on **volatility momentum** (VIX lags) as the primary crash indicator.
 
 ---
 
