@@ -3,6 +3,7 @@
 
 __version__ = "0.1.0"
 
+# Feature Schema
 from .feature_schema import (
     MODEL_FEATURES,
     N_FEATURES,
@@ -14,6 +15,7 @@ from .feature_schema import (
     get_feature_category,
 )
 
+# Data Loader
 from .data_loader import (
     load_financial_market_data,
     load_user_csv,
@@ -26,6 +28,7 @@ from .data_loader import (
     clear_cache,
 )
 
+# Feature Engineering
 from .feature_engineering import (
     FeatureTransformer,
     compute_returns,
@@ -38,6 +41,40 @@ from .feature_engineering import (
     compute_drawdown,
     engineer_features,
 )
+
+# Model Utilities
+from .model_utils import (
+    load_model,
+    validate_model,
+    get_model_info,
+    get_model,
+    clear_model_cache,
+    get_feature_importance,
+)
+
+# Predictor
+from .predictor import (
+    RiskLevel,
+    RISK_THRESHOLDS,
+    RISK_COLORS,
+    RISK_DESCRIPTIONS,
+    PredictionResult,
+    CrashPredictor,
+    predict_crash_probability,
+    classify_risk_level,
+    get_risk_summary,
+)
+
+# Explainer
+from .explainer import (
+    FeatureContribution,
+    PredictionExplanation,
+    CrashExplainer,
+    explain_prediction,
+    get_top_contributors,
+    format_explanation_text,
+)
+
 
 __all__ = [
     # Version
@@ -72,4 +109,28 @@ __all__ = [
     "detect_market_regime",
     "compute_drawdown",
     "engineer_features",
+    # Model Utilities
+    "load_model",
+    "validate_model",
+    "get_model_info",
+    "get_model",
+    "clear_model_cache",
+    "get_feature_importance",
+    # Predictor
+    "RiskLevel",
+    "RISK_THRESHOLDS",
+    "RISK_COLORS",
+    "RISK_DESCRIPTIONS",
+    "PredictionResult",
+    "CrashPredictor",
+    "predict_crash_probability",
+    "classify_risk_level",
+    "get_risk_summary",
+    # Explainer
+    "FeatureContribution",
+    "PredictionExplanation",
+    "CrashExplainer",
+    "explain_prediction",
+    "get_top_contributors",
+    "format_explanation_text",
 ]
