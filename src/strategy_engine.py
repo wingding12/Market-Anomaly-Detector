@@ -102,12 +102,12 @@ DEFAULT_ALLOCATIONS = {
     },
 }
 
-# Risk-level to strategy mapping
+# Risk-level to strategy mapping (use string keys for compatibility)
 RISK_STRATEGY_MAP = {
-    RiskLevel.LOW: StrategyType.GROWTH,
-    RiskLevel.MEDIUM: StrategyType.BALANCED,
-    RiskLevel.HIGH: StrategyType.CONSERVATIVE,
-    RiskLevel.CRITICAL: StrategyType.DEFENSIVE,
+    "low": StrategyType.GROWTH,
+    "medium": StrategyType.BALANCED,
+    "high": StrategyType.CONSERVATIVE,
+    "critical": StrategyType.DEFENSIVE,
 }
 
 
@@ -237,7 +237,7 @@ class StrategyEngine:
             Complete StrategyRecommendation.
         """
         # Determine recommended strategy based on risk level
-        base_strategy = RISK_STRATEGY_MAP[prediction.risk_level]
+        base_strategy = RISK_STRATEGY_MAP[prediction.risk_level.value]
         
         # Adjust for investor risk tolerance
         recommended_strategy = self._adjust_for_tolerance(base_strategy)
