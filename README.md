@@ -192,14 +192,16 @@ The Strategy page lets you backtest all four approaches against a 60/40 benchmar
 ├── pages/
 │   ├── 1_📊_Analysis.py          # Deep-dive analytics
 │   ├── 2_📜_Historical.py        # Event studies
-│   └── 3_💰_Strategies.py        # Investment strategy backtester
+│   ├── 3_💰_Strategies.py        # Investment strategy backtester
+│   └── 4_🤖_Advisor.py           # AI strategy advisor chatbot
 └── src/
     ├── data_loader.py            # Data ingestion pipeline
     ├── feature_engineering.py    # Transformations
     ├── predictor.py              # Model inference
     ├── explainer.py              # SHAP attribution
     ├── strategy_engine.py        # Portfolio recommendations
-    └── investment_strategies.py  # Systematic trading strategies
+    ├── investment_strategies.py  # Systematic trading strategies
+    └── strategy_explainer.py     # AI explanation engine
 ```
 
 ### Dashboard (Main Page)
@@ -242,6 +244,82 @@ Full investment strategy backtesting:
 - **Drawdown Analysis**: Compare worst-case scenarios across approaches
 - **Dynamic Allocation Chart**: See how weights change over time for each strategy
 - **Risk-Return Scatter**: Visual comparison of return vs volatility trade-offs
+
+### Advisor Page
+
+Interactive AI assistant that explains market conditions and strategies in plain language:
+
+- **Conversational Interface**: Ask questions naturally—"What should I do now?" or "Why is risk high?"
+- **Adaptive Communication**: Three modes (Simple/Balanced/Technical) that adjust explanations to your experience level
+- **Context-Aware Responses**: Answers incorporate current market state and your risk tolerance
+- **Quick Action Buttons**: One-click access to common questions
+- **Strategy Explainer**: Get detailed breakdowns of any strategy's logic and trade-offs
+
+The advisor translates complex quantitative signals into actionable guidance without requiring deep financial expertise.
+
+---
+
+## AI Strategy Advisor
+
+The Advisor module provides intelligent explanations tailored to the user's background. It's designed to make sophisticated risk analytics accessible to a broader audience.
+
+### Communication Styles
+
+| Style         | Audience                           | Example Output                                                                                                                   |
+| ------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Simple**    | New investors, non-financial users | "Markets look risky right now. The danger level is 72%—similar to conditions before past drops."                                 |
+| **Balanced**  | Intermediate investors, advisors   | "Current crash probability: 72%. Multiple risk factors are elevated, warranting defensive positioning."                          |
+| **Technical** | Quants, portfolio managers         | "P(crash) = 72.0%. Cross-asset stress confirmation: VIX momentum +, credit spreads widening, rates signaling flight-to-quality." |
+
+### What the Advisor Can Explain
+
+**Market Conditions**
+
+- Current risk level and what's driving it
+- Why certain factors are flagged as concerning
+- How today compares to historical stress periods
+
+**Investment Strategies**
+
+- How each strategy works and when it's appropriate
+- Trade-offs between different approaches
+- Why a specific allocation is recommended
+
+**Financial Concepts**
+
+- Sharpe ratio, max drawdown, VIX, and other metrics
+- Hedging approaches and their costs
+- When to re-enter after defensive positioning
+
+**Actionable Guidance**
+
+- Specific steps based on current risk level
+- Position sizing recommendations
+- Hedging instrument suggestions
+
+### Example Interactions
+
+**User**: "What should I do now?"
+
+**Advisor** (Balanced mode, High risk):
+
+> Based on current HIGH risk conditions:
+>
+> 1. Reduce equity to 25-35% of portfolio
+> 2. Increase bond allocation, favoring quality
+> 3. Raise cash to 15-20%
+> 4. Exit speculative and leveraged positions
+
+**User**: "Explain the momentum strategy"
+
+**Advisor**:
+
+> **Momentum + Risk Overlay**: Combines trend-following with crash protection.
+> The strategy stays invested when momentum is positive and risk is manageable,
+> but exits when either signal turns negative.
+>
+> **Pros:** Captures trends, double protection, clear exit rules
+> **Cons:** May miss reversals, whipsaws possible
 
 ---
 

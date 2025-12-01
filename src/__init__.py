@@ -108,6 +108,21 @@ from .investment_strategies import (
     get_current_recommendation,
 )
 
+# Strategy Explainer (AI Advisor)
+from .strategy_explainer import (
+    ExperienceLevel,
+    CommunicationStyle,
+    UserProfile,
+    MarketContext,
+    StrategyExplainer,
+    ConversationManager,
+    Message,
+    RISK_EXPLANATIONS,
+    STRATEGY_EXPLANATIONS,
+    ACTION_TEMPLATES,
+    QA_KNOWLEDGE,
+)
+
 
 __all__ = [
     # Version
@@ -193,4 +208,16 @@ __all__ = [
     "calculate_drawdown_series",
     "get_strategy_weights_history",
     "get_current_recommendation",
+    # Strategy Explainer (AI Advisor)
+    "ExperienceLevel",
+    "CommunicationStyle",
+    "UserProfile",
+    "MarketContext",
+    "StrategyExplainer",
+    "ConversationManager",
+    "Message",
+    "RISK_EXPLANATIONS",
+    "STRATEGY_EXPLANATIONS",
+    "ACTION_TEMPLATES",
+    "QA_KNOWLEDGE",
 ]
