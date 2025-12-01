@@ -75,6 +75,21 @@ from .explainer import (
     format_explanation_text,
 )
 
+# Strategy Engine
+from .strategy_engine import (
+    StrategyType,
+    ActionType,
+    AssetAllocation,
+    StrategyRecommendation,
+    HedgeRecommendation,
+    StrategyEngine,
+    get_hedge_recommendations,
+    format_recommendation_text,
+    DEFAULT_ALLOCATIONS,
+    RISK_STRATEGY_MAP,
+    STRATEGY_DETAILS,
+)
+
 
 __all__ = [
     # Version
@@ -133,4 +148,16 @@ __all__ = [
     "explain_prediction",
     "get_top_contributors",
     "format_explanation_text",
+    # Strategy Engine
+    "StrategyType",
+    "ActionType",
+    "AssetAllocation",
+    "StrategyRecommendation",
+    "HedgeRecommendation",
+    "StrategyEngine",
+    "get_hedge_recommendations",
+    "format_recommendation_text",
+    "DEFAULT_ALLOCATIONS",
+    "RISK_STRATEGY_MAP",
+    "STRATEGY_DETAILS",
 ]
