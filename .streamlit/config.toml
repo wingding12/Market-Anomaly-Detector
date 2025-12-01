@@ -1,23 +1,39 @@
 [theme]
-# Custom theme for Market Anomaly Detector
-primaryColor = "#FF4B4B"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#262730"
-textColor = "#FAFAFA"
+# Market Anomaly Detector - Custom Theme
+# Modern dark theme with accent colors
+
+primaryColor = "#6366f1"
+backgroundColor = "#0f0f1a"
+secondaryBackgroundColor = "#1a1a2e"
+textColor = "#fafafa"
 font = "sans serif"
 
 [server]
-# Server configuration
+# Server configuration for deployment
 headless = true
-enableCORS = false
+port = 8501
+enableStaticServing = true
+
+# Security settings (compatible)
 enableXsrfProtection = true
+enableCORS = true
 
 [browser]
 # Browser settings
 gatherUsageStats = false
+serverAddress = "localhost"
 
 [runner]
 # Runner configuration
 magicEnabled = true
 fastReruns = true
 
+[client]
+# Client-side settings
+showErrorDetails = true
+toolbarMode = "minimal"
+
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s %(levelname)s - %(message)s"

@@ -1,5 +1,6 @@
 # Market Anomaly Detector - Dependencies
 # Python 3.9+ required
+# Install with: pip install -r requirements.txt
 
 # ============================================
 # Web Framework
@@ -20,7 +21,7 @@ xgboost>=2.0.0
 shap>=0.43.0
 
 # ============================================
-# Data Fetching
+# Data Fetching (optional, for future use)
 # ============================================
 yfinance>=0.2.31
 
@@ -28,11 +29,13 @@ yfinance>=0.2.31
 # Visualization
 # ============================================
 plotly>=5.18.0
-altair>=5.1.0
 
 # ============================================
 # Utilities
 # ============================================
 python-dateutil>=2.8.2
-pytz>=2023.3
 
+# ============================================
+# Development (optional)
+# ============================================
+# watchdog>=3.0.0  # For better Streamlit reloading

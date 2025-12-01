@@ -9,6 +9,31 @@ An early warning system for detecting potential financial market crashes using m
 
 ---
 
+## 🖥️ Screenshots
+
+### Main Dashboard
+
+- Real-time crash probability gauge with color-coded risk levels
+- Strategy recommendations with portfolio allocation charts
+- SHAP-based feature importance analysis
+- Historical probability timeline
+
+### Analysis Page
+
+- Interactive date range selection
+- Rolling statistics with confidence bands
+- Risk distribution pie charts
+- Feature category importance breakdown
+
+### Historical Page
+
+- Analysis of major market events (2000-2020)
+- Cross-event comparison charts
+- VIX-based market regime detection
+- High-risk period identification
+
+---
+
 ## 🎯 Features
 
 - **Real-time Market Analysis**: Monitor current market conditions and crash probability
@@ -16,6 +41,7 @@ An early warning system for detecting potential financial market crashes using m
 - **Explainable AI**: SHAP-based explanations for understanding prediction drivers
 - **Investment Strategies**: Automated risk mitigation recommendations
 - **Interactive Dashboard**: Beautiful, intuitive Streamlit-powered interface
+- **Multi-page App**: Dedicated pages for detailed analysis and historical review
 
 ---
 
@@ -30,28 +56,28 @@ Market-Anomaly-Detector/
 ├── README.md                 # This file
 │
 ├── .streamlit/
-│   └── config.toml          # Streamlit theme & configuration
+│   ├── config.toml          # Streamlit theme & configuration
+│   └── secrets.toml.example # Secrets template
 │
 ├── src/                     # Core source modules
-│   ├── __init__.py
+│   ├── __init__.py          # Package exports
 │   ├── feature_schema.py    # Feature definitions & validation
 │   ├── data_loader.py       # Data fetching & CSV handling
 │   ├── feature_engineering.py # Feature extraction pipeline
 │   ├── model_utils.py       # Model loading utilities
 │   ├── predictor.py         # Prediction wrapper
 │   ├── explainer.py         # SHAP explainability
-│   ├── strategy_engine.py   # Investment recommendations
-│   └── backtester.py        # Historical analysis
+│   └── strategy_engine.py   # Investment recommendations
 │
 ├── pages/                   # Streamlit multi-page app
-│   ├── 1_Dashboard.py       # Main monitoring dashboard
-│   └── 2_Historical.py      # Historical analysis page
+│   ├── 1_📊_Analysis.py     # Detailed analysis page
+│   └── 2_📜_Historical.py   # Historical events page
 │
 ├── data/                    # User data & cache
-│   └── (user-uploaded CSVs)
+│   └── .gitkeep
 │
 └── models/                  # Model artifacts
-    └── (saved models)
+    └── .gitkeep
 ```
 
 ---
@@ -96,6 +122,37 @@ Market-Anomaly-Detector/
 
 ---
 
+## 🌐 Deployment
+
+### Streamlit Cloud (Recommended)
+
+1. Push your code to GitHub
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub repository
+4. Select `app.py` as the main file
+5. Deploy!
+
+### Docker
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+```
+
+### Environment Variables
+
+Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml` for any API keys or sensitive configuration.
+
+---
+
 ## 📊 How It Works
 
 ### Anomaly Detection Approach
@@ -104,8 +161,8 @@ This system uses an **XGBoost classifier** trained on historical market data to 
 
 ### Key Components
 
-1. **Data Ingestion**: Fetches market data via Yahoo Finance API or accepts user-uploaded CSV files
-2. **Feature Engineering**: Extracts technical indicators and market signals
+1. **Data Ingestion**: Loads market data from CSV with 62 financial indicators
+2. **Feature Engineering**: Computes lag features for VIX and MSCI World
 3. **Crash Prediction**: XGBoost model outputs crash probability (0-100%)
 4. **Explainability**: SHAP values reveal which features drive predictions
 5. **Strategy Engine**: Converts predictions into actionable investment advice
@@ -126,33 +183,39 @@ This system uses an **XGBoost classifier** trained on historical market data to 
 ### Project Phases
 
 - [x] **Phase 1**: Foundation & Data Layer ✅
-
-  - [x] Step 1.1: Project structure setup
-  - [x] Step 1.2: Inspect model input requirements
-  - [x] Step 1.3: Data fetching module
-  - [x] Step 1.4: Feature engineering pipeline
-  - [x] Step 1.5: Integration testing
-
 - [x] **Phase 2**: Model Integration ✅
 - [x] **Phase 3**: Strategy Engine ✅
 - [x] **Phase 4**: Streamlit UI - Core ✅
 - [x] **Phase 5**: Streamlit UI - Visualizations ✅
 - [x] **Phase 6**: Historical Analysis ✅
-- [ ] **Phase 7**: Polish & Deployment
+- [x] **Phase 7**: Polish & Deployment ✅
+
+### Running Tests
+
+```bash
+# Test data loading
+python -m src.data_loader
+
+# Test predictions
+python -m src.predictor
+
+# Test explanations
+python -m src.explainer
+
+# Test strategies
+python -m src.strategy_engine
+```
 
 ---
 
 ## 📈 Data Sources
 
-The application supports multiple data sources:
+The application uses the included dataset:
 
-- **Included Dataset**: `FinancialMarketData.csv` with 1,149 weekly observations (1999-2021)
-- **CSV Upload**: Custom datasets matching the required feature schema
-- **Pre-loaded Samples**: Demo data for testing
+- **FinancialMarketData.csv**: 1,149 weekly observations (1999-2021)
+- **62 features** covering global financial markets
 
 ### Data Format
-
-The model expects **62 features** covering global financial markets:
 
 | Category                 | Features | Examples                                            |
 | ------------------------ | -------- | --------------------------------------------------- |
@@ -173,7 +236,7 @@ See `src/feature_schema.py` for the complete feature specification.
 
 ### Pre-trained Model
 
-The included `xgb_weights.pkl` is a pre-trained XGBoost binary classifier that predicts market crash conditions.
+The included `xgb_weights.pkl` is a pre-trained XGBoost binary classifier.
 
 | Property      | Value                         |
 | ------------- | ----------------------------- |
@@ -231,6 +294,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+---
+
+## 🙏 Acknowledgments
+
+- XGBoost team for the excellent gradient boosting library
+- Streamlit team for the amazing web framework
+- SHAP library for explainable AI capabilities
 
 ---
 
