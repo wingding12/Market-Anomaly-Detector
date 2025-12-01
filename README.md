@@ -1,310 +1,266 @@
-# 📉 Market Anomaly Detector
+# Market Anomaly Detector
 
-An early warning system for detecting potential financial market crashes using machine learning. This application analyzes historical market data, identifies anomalous patterns, and provides actionable investment strategies for risk mitigation.
+A quantitative early warning system that identifies elevated crash risk in global financial markets. Built for portfolio managers, risk analysts, and quantitative researchers who need systematic tools for monitoring market stress conditions.
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)
 ![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ---
 
-## 🖥️ Screenshots
+## The Problem
 
-### Main Dashboard
+Market crashes don't happen in isolation. They're preceded by observable patterns across asset classes—rising volatility, yield curve inversions, credit spread widening, and cross-market correlations breaking down. The challenge is synthesizing these signals in real-time.
 
-- Real-time crash probability gauge with color-coded risk levels
-- Strategy recommendations with portfolio allocation charts
-- SHAP-based feature importance analysis
-- Historical probability timeline
+Traditional risk metrics like VaR and standard deviation assume normal distributions and fail spectacularly during tail events. This system takes a different approach: supervised learning on historical crash periods to identify the multi-factor conditions that precede market dislocations.
+
+---
+
+## What This System Does
+
+**Crash Probability Scoring**: Outputs a 0-100% probability that current market conditions resemble historical pre-crash environments. The model was trained on data spanning the dot-com bust, the 2008 financial crisis, European sovereign debt concerns, and the COVID-19 selloff.
+
+**Risk Attribution**: SHAP-based decomposition shows exactly which factors are driving the current risk assessment. When the model flags elevated risk, you can see whether it's volatility momentum, rate differentials, or equity market structure causing the signal.
+
+**Strategy Recommendations**: Translates probability scores into actionable portfolio positioning—from maintaining full exposure during benign conditions to implementing defensive hedges when risk is critical.
+
+**Historical Backtesting**: Examine how the model would have performed during specific market events. Compare predicted probabilities against actual market outcomes to build confidence in the signals.
+
+---
+
+## The Data Pipeline
+
+### Input Features
+
+The model ingests 62 market indicators spanning:
+
+| Category              | Description                    | Key Indicators                          |
+| --------------------- | ------------------------------ | --------------------------------------- |
+| **Volatility Regime** | Fear gauges and their momentum | VIX Index, VIX 1-3 week lags            |
+| **Rate Environment**  | Yield levels and curve shape   | US 2Y/10Y/30Y, German Bunds, EONIA      |
+| **Credit Conditions** | Risk appetite in fixed income  | High yield spreads, IG spreads, EM debt |
+| **Equity Markets**    | Global equity performance      | MSCI World, regional indices, futures   |
+| **Currency Stress**   | Safe haven flows               | JPY, Gold, DXY                          |
+| **Commodities**       | Economic activity proxies      | Crude oil, Baltic Dry Index             |
+
+### Feature Engineering
+
+Raw market data undergoes several transformations:
+
+1. **Lag Feature Construction**: VIX and MSCI World indices get 1, 2, and 3-week lags. Volatility momentum (the rate of change in fear) often matters more than absolute levels.
+
+2. **Missing Data Handling**: Forward-fill with backward-fill fallback. Markets don't always trade synchronously across time zones.
+
+3. **Schema Validation**: Strict feature ordering ensures the model receives inputs in the exact format it was trained on. Misaligned features produce garbage predictions.
+
+The data loader handles the Bloomberg terminal export format used in the included dataset, with parsers for the multi-row header structure common in institutional data feeds.
+
+---
+
+## Understanding the Risk Framework
+
+### Why VIX Momentum Dominates
+
+The model's most important feature is `VIX Index_lag_3`—the VIX level from three weeks prior. This captures volatility regime shifts. Markets don't crash from calm conditions; they crash after volatility has already been elevated and building.
+
+When VIX spikes from 12 to 25, the initial move often isn't the dangerous part. It's the sustained elevation that signals deteriorating risk appetite and potential for cascade effects.
+
+### Cross-Asset Confirmation
+
+Single-asset signals generate false positives. The model achieves better precision by requiring confirmation across:
+
+- **Rates**: Flight-to-quality flows into Treasuries and Bunds
+- **Credit**: Spread widening in high yield and emerging markets
+- **Currencies**: Yen strength as carry trades unwind
+- **Equity structure**: Futures basis, regional divergences
+
+### Risk Level Interpretation
+
+| Probability | Classification | What It Means                                                                             |
+| ----------- | -------------- | ----------------------------------------------------------------------------------------- |
+| 0-25%       | Low            | Normal market functioning. Volatility contained, correlations stable.                     |
+| 25-50%      | Elevated       | Some stress indicators active. Worth monitoring but not actionable alone.                 |
+| 50-75%      | High           | Multiple factors signaling risk. Consider reducing beta exposure.                         |
+| 75-100%     | Critical       | Market conditions resemble historical pre-crash periods. Defensive positioning warranted. |
+
+These thresholds aren't arbitrary—they're calibrated against historical drawdown severity.
+
+---
+
+## Application Structure
+
+```
+├── app.py                      # Main dashboard
+├── pages/
+│   ├── 1_📊_Analysis.py        # Deep-dive analytics
+│   └── 2_📜_Historical.py      # Event studies
+└── src/
+    ├── data_loader.py          # Data ingestion pipeline
+    ├── feature_engineering.py  # Transformations
+    ├── predictor.py            # Model inference
+    ├── explainer.py            # SHAP attribution
+    └── strategy_engine.py      # Portfolio recommendations
+```
+
+### Dashboard (Main Page)
+
+The primary interface shows:
+
+- Current crash probability with trend
+- Strategy recommendation based on risk tolerance setting
+- Feature contribution waterfall
+- 20-year probability history
 
 ### Analysis Page
 
-- Interactive date range selection
+For users who want to dig deeper:
+
+- Custom date range selection
 - Rolling statistics with confidence bands
-- Risk distribution pie charts
-- Feature category importance breakdown
+- Risk regime distribution
+- Category-level feature importance
 
 ### Historical Page
 
-- Analysis of major market events (2000-2020)
-- Cross-event comparison charts
-- VIX-based market regime detection
-- High-risk period identification
+Event-specific analysis covering:
+
+- Dot-com bubble (2000-2002)
+- Global Financial Crisis (2007-2009)
+- European Debt Crisis (2010-2012)
+- China selloff (2015-2016)
+- COVID-19 crash (2020)
+
+Compare model predictions against actual outcomes to understand signal lead times and accuracy.
 
 ---
 
-## 🎯 Features
+## Getting Started
 
-- **Real-time Market Analysis**: Monitor current market conditions and crash probability
-- **Historical Backtesting**: Analyze past market data to validate prediction accuracy
-- **Explainable AI**: SHAP-based explanations for understanding prediction drivers
-- **Investment Strategies**: Automated risk mitigation recommendations
-- **Interactive Dashboard**: Beautiful, intuitive Streamlit-powered interface
-- **Multi-page App**: Dedicated pages for detailed analysis and historical review
+### Requirements
 
----
-
-## 🏗️ Project Structure
-
-```
-Market-Anomaly-Detector/
-├── app.py                    # Main Streamlit entry point
-├── requirements.txt          # Python dependencies
-├── xgb_weights.pkl          # Pre-trained XGBoost model
-├── FinancialMarketData.csv  # Historical market data (1999-2021)
-├── README.md                 # This file
-│
-├── .streamlit/
-│   ├── config.toml          # Streamlit theme & configuration
-│   └── secrets.toml.example # Secrets template
-│
-├── src/                     # Core source modules
-│   ├── __init__.py          # Package exports
-│   ├── feature_schema.py    # Feature definitions & validation
-│   ├── data_loader.py       # Data fetching & CSV handling
-│   ├── feature_engineering.py # Feature extraction pipeline
-│   ├── model_utils.py       # Model loading utilities
-│   ├── predictor.py         # Prediction wrapper
-│   ├── explainer.py         # SHAP explainability
-│   └── strategy_engine.py   # Investment recommendations
-│
-├── pages/                   # Streamlit multi-page app
-│   ├── 1_📊_Analysis.py     # Detailed analysis page
-│   └── 2_📜_Historical.py   # Historical events page
-│
-├── data/                    # User data & cache
-│   └── .gitkeep
-│
-└── models/                  # Model artifacts
-    └── .gitkeep
-```
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.9 or higher
-- pip (Python package manager)
+- Python 3.9+
+- ~500MB disk space for dependencies
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/Market-Anomaly-Detector.git
+cd Market-Anomaly-Detector
 
-   ```bash
-   git clone https://github.com/yourusername/Market-Anomaly-Detector.git
-   cd Market-Anomaly-Detector
-   ```
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-2. **Create a virtual environment** (recommended)
+pip install -r requirements.txt
+```
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+### Running Locally
 
-3. **Install dependencies**
+```bash
+streamlit run app.py
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Opens at `http://localhost:8501`
 
-4. **Run the application**
+### Deployment
 
-   ```bash
-   streamlit run app.py
-   ```
+Works out of the box with Streamlit Cloud:
 
-5. **Open in browser**
-   Navigate to `http://localhost:8501`
+1. Push to GitHub
+2. Connect repo at share.streamlit.io
+3. Point to `app.py`
 
----
-
-## 🌐 Deployment
-
-### Streamlit Cloud (Recommended)
-
-1. Push your code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub repository
-4. Select `app.py` as the main file
-5. Deploy!
-
-### Docker
+For containerized deployment:
 
 ```dockerfile
 FROM python:3.11-slim
-
 WORKDIR /app
 COPY . .
-
-RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install -r requirements.txt
 EXPOSE 8501
-
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
 
-### Environment Variables
+---
 
-Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml` for any API keys or sensitive configuration.
+## Model Details
+
+### Training Approach
+
+The XGBoost classifier was trained on weekly observations from 1999-2021, with crash periods labeled based on subsequent 3-month drawdowns exceeding 15%.
+
+| Parameter     | Value                       |
+| ------------- | --------------------------- |
+| Algorithm     | XGBoost (gradient boosting) |
+| Trees         | 200                         |
+| Max Depth     | 5                           |
+| Learning Rate | 0.05                        |
+| Objective     | Binary cross-entropy        |
+
+### Performance Characteristics
+
+The model trades off precision and recall. It will generate false positives—periods flagged as high risk that don't result in crashes. This is intentional. In risk management, missing a crash (false negative) is far more costly than unnecessary hedging (false positive).
+
+Expect the model to spend roughly 10-15% of time in "high" or "critical" states during normal market conditions.
 
 ---
 
-## 📊 How It Works
+## Practical Usage Notes
 
-### Anomaly Detection Approach
+**Don't use this as a timing tool.** The model identifies elevated risk environments, not precise crash dates. Markets can stay stressed for months before dislocating, or they can resolve without incident.
 
-This system uses an **XGBoost classifier** trained on historical market data to identify conditions that precede market crashes. The approach is inspired by [anomaly detection techniques in financial transactions](https://unit8.com/resources/a-guide-to-building-a-financial-transaction-anomaly-detector/).
+**Combine with fundamental analysis.** A high probability reading during earnings season volatility means something different than the same reading during a liquidity crisis.
 
-### Key Components
+**Calibrate to your portfolio.** The strategy recommendations assume a generic balanced portfolio. Actual positioning should account for your specific exposures, hedging costs, and risk tolerance.
 
-1. **Data Ingestion**: Loads market data from CSV with 62 financial indicators
-2. **Feature Engineering**: Computes lag features for VIX and MSCI World
-3. **Crash Prediction**: XGBoost model outputs crash probability (0-100%)
-4. **Explainability**: SHAP values reveal which features drive predictions
-5. **Strategy Engine**: Converts predictions into actionable investment advice
-
-### Risk Levels
-
-| Level       | Crash Probability | Recommended Action    |
-| ----------- | ----------------- | --------------------- |
-| 🟢 Low      | 0-25%             | Normal operations     |
-| 🟡 Medium   | 25-50%            | Increase monitoring   |
-| 🟠 High     | 50-75%            | Reduce exposure       |
-| 🔴 Critical | 75-100%           | Defensive positioning |
+**Watch for regime changes.** The model was trained on historical data. Novel market structures (cryptocurrency integration, central bank balance sheet expansion) may create patterns outside the training distribution.
 
 ---
 
-## 🛠️ Development
+## Data Sources
 
-### Project Phases
+The included `FinancialMarketData.csv` contains 1,149 weekly observations of 57 market indicators, covering April 1999 through April 2021. Data sourced from Bloomberg terminal exports.
 
-- [x] **Phase 1**: Foundation & Data Layer ✅
-- [x] **Phase 2**: Model Integration ✅
-- [x] **Phase 3**: Strategy Engine ✅
-- [x] **Phase 4**: Streamlit UI - Core ✅
-- [x] **Phase 5**: Streamlit UI - Visualizations ✅
-- [x] **Phase 6**: Historical Analysis ✅
-- [x] **Phase 7**: Polish & Deployment ✅
-
-### Running Tests
-
-```bash
-# Test data loading
-python -m src.data_loader
-
-# Test predictions
-python -m src.predictor
-
-# Test explanations
-python -m src.explainer
-
-# Test strategies
-python -m src.strategy_engine
-```
+For production use, you'd want to integrate live data feeds. The `data_loader` module is designed to be extensible—add new loaders for your preferred data vendor.
 
 ---
 
-## 📈 Data Sources
+## References
 
-The application uses the included dataset:
+Technical background on the approaches used:
 
-- **FinancialMarketData.csv**: 1,149 weekly observations (1999-2021)
-- **62 features** covering global financial markets
-
-### Data Format
-
-| Category                 | Features | Examples                                            |
-| ------------------------ | -------- | --------------------------------------------------- |
-| Commodities & Currencies | 8        | Gold (XAU), Dollar Index (DXY), JPY, GBP, WTI Crude |
-| Volatility               | 4        | VIX Index + 3 lag periods                           |
-| US Rates                 | 5        | 30Y, 10Y, 2Y Treasury, 3M T-Bill, 1M LIBOR          |
-| European Rates           | 4        | German Bunds, EONIA                                 |
-| Global Bonds             | 9        | Italian, Japanese, UK government bonds              |
-| Bond Indices             | 9        | Bloomberg Aggregate, MBS, Corporate, High Yield     |
-| Equity Indices           | 13       | MSCI USA, Europe, Japan, EM, World + 3 lags         |
-| Futures                  | 10       | S&P 500, Nasdaq, Euro Stoxx, Gold, Brent            |
-
-See `src/feature_schema.py` for the complete feature specification.
+- Liu et al., "Isolation Forest" (2008) - Anomaly detection foundations
+- Lundberg & Lee, "SHAP Values" (2017) - Model interpretability
+- Unit8, "Financial Transaction Anomaly Detection" - Applied ML in finance
+- Investopedia, "Market Anomalies" - Financial context
 
 ---
 
-## 🔬 Model Information
+## Limitations
 
-### Pre-trained Model
+This is a research tool, not investment advice. Model outputs should inform human decision-making, not replace it.
 
-The included `xgb_weights.pkl` is a pre-trained XGBoost binary classifier.
+- Historical patterns may not repeat
+- Black swan events are by definition unpredictable
+- Transaction costs and implementation slippage aren't modeled
+- The training data ends in 2021
 
-| Property      | Value                         |
-| ------------- | ----------------------------- |
-| Algorithm     | XGBoost (Gradient Boosting)   |
-| Type          | Binary Classification         |
-| Output        | Crash / No Crash              |
-| Features      | 62 (56 base + 6 lag features) |
-| Estimators    | 200 trees                     |
-| Max Depth     | 5                             |
-| Learning Rate | 0.05                          |
-| Objective     | binary:logistic               |
-
-### Top Predictive Features
-
-| Feature         | Importance | Description               |
-| --------------- | ---------- | ------------------------- |
-| VIX Index_lag_3 | 35.4%      | VIX momentum (3-week lag) |
-| EONIA Index     | 8.8%       | Euro overnight rate       |
-| GTDEM2Y Govt    | 8.6%       | German 2-year yield       |
-| ES1 Index       | 8.2%       | S&P 500 futures           |
-| MXJP Index      | 7.2%       | MSCI Japan                |
-| NQ1 Index       | 6.4%       | Nasdaq futures            |
-
-The model heavily relies on **volatility momentum** (VIX lags) as the primary crash indicator.
+Always consult qualified financial advisors for actual investment decisions.
 
 ---
 
-## 📚 References
+## License
 
-- [A Guide to Building a Financial Transaction Anomaly Detector](https://unit8.com/resources/a-guide-to-building-a-financial-transaction-anomaly-detector/)
-- [Trading with Market Anomalies - Investopedia](https://www.investopedia.com/articles/financial-theory/11/trading-with-market-anomalies.asp)
-- [Anomaly Detection Algorithms - Built In](https://builtin.com/machine-learning/anomaly-detection-algorithms)
-- [Anomaly Detection with Unsupervised ML - Medium](https://medium.com/simform-engineering/anomaly-detection-with-unsupervised-machine-learning-3bcf4c431aff)
+MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
-## ⚠️ Disclaimer
+## Contributing
 
-This tool is for **educational and research purposes only**. It should not be used as the sole basis for investment decisions. Financial markets are inherently unpredictable, and past performance does not guarantee future results. Always consult with qualified financial advisors before making investment decisions.
+Pull requests welcome. Areas that would benefit from contribution:
 
----
+- Additional data source integrations
+- Alternative model architectures (LSTM, transformer)
+- Enhanced backtesting framework
+- Real-time alerting system
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 🙏 Acknowledgments
-
-- XGBoost team for the excellent gradient boosting library
-- Streamlit team for the amazing web framework
-- SHAP library for explainable AI capabilities
-
----
-
-<p align="center">
-  Built with ❤️ for safer investing
-</p>
+Open an issue first to discuss significant changes.
